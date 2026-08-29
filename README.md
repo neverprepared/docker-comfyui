@@ -1,8 +1,29 @@
 # docker-comfyui
 
+[![build-and-push](https://github.com/neverprepared/docker-comfyui/actions/workflows/build.yml/badge.svg)](https://github.com/neverprepared/docker-comfyui/actions/workflows/build.yml)
+
 Run [ComfyUI](https://github.com/comfyanonymous/ComfyUI) with
-[ComfyUI-Manager](https://github.com/ltdrdata/ComfyUI-Manager) locally in Docker,
+[ComfyUI-Manager](https://github.com/ltdrdata/ComfyUI-Manager) in Docker,
 using your NVIDIA GPU.
+
+## Prebuilt image
+
+CI builds and publishes an x86_64 image to GHCR on every push to `main` and
+weekly (Mondays):
+
+```
+ghcr.io/neverprepared/docker-comfyui:latest
+```
+
+To use it instead of building locally, replace the `build:` block in
+`docker-compose.yml` with:
+
+```yaml
+    image: ghcr.io/neverprepared/docker-comfyui:latest
+```
+
+(keeping the rest of the service — ports, volumes, GPU reservation — unchanged),
+then `docker compose up -d`.
 
 ## Requirements
 
