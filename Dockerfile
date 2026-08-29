@@ -12,19 +12,22 @@ ENV DEBIAN_FRONTEND=noninteractive \
     VIRTUAL_ENV=/opt/venv \
     PATH=/opt/venv/bin:$PATH
 
-# uv: fast Python package installer/resolver (replaces pip).
-# Pin a specific tag (e.g. :0.5.11) for reproducible builds.
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
-
-# System deps: git, the libGL/glib libraries many nodes need, and ffmpeg.
-# Python itself comes from uv (below), not apt.
+# System deps: git, curl (for the uv installer), the libGL/glib libraries many
+# nodes need, and ffmpeg. Python itself comes from uv (below), not apt.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
+        curl \
         libgl1 \
         libglib2.0-0 \
         ffmpeg \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+# uv: fast Python package installer/resolver (replaces pip). Installed via the
+# official script (avoids ghcr.io registry auth). Pin a version by using a
+# versioned URL, e.g. https://astral.sh/uv/0.5.11/install.sh
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+RUN UV_INSTALL_DIR=/usr/local/bin sh /uv-installer.sh && rm /uv-installer.sh
 
 # Python 3.13 (ComfyUI's recommended version) via a uv-managed standalone build.
 # Override with --build-arg PYTHON_VERSION=3.12 if a node pack needs an older one.
