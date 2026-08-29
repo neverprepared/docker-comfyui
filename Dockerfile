@@ -1,7 +1,7 @@
 # ComfyUI + ComfyUI-Manager, CUDA/NVIDIA enabled
 # Base: CUDA runtime with cuDNN. Torch's CUDA wheels bundle the CUDA libraries,
 # but a CUDA base keeps GPU-compiled custom nodes (installed via Manager) happy.
-FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
+FROM nvidia/cuda:12.8.0-cudnn-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -35,9 +35,13 @@ ARG PYTHON_VERSION=3.13
 RUN uv venv --python "${PYTHON_VERSION}" "${VIRTUAL_ENV}" \
     && uv pip install pip  # ComfyUI-Manager shells out to pip when installing nodes
 
-# PyTorch with CUDA support. Override the CUDA channel at build time if needed,
-# e.g. --build-arg TORCH_CUDA_CHANNEL=cu121
-ARG TORCH_CUDA_CHANNEL=cu124
+# PyTorch with CUDA support. The channel caps the torch version: cu124 tops out
+# at torch 2.6.0, whose torch.library.infer_schema rejects PEP 585 builtin
+# generics (e.g. `list[int]`). Current ComfyUI master's comfy_kitchen backend
+# registers custom ops annotated that way, so it fails to import on 2.6.0.
+# Newer torch registers the `list[...]` spellings (verified in 2.10.0); cu128
+# provides torch 2.10+. Override if needed, e.g. --build-arg TORCH_CUDA_CHANNEL=cu126.
+ARG TORCH_CUDA_CHANNEL=cu128
 RUN uv pip install \
         torch torchvision torchaudio \
         --index-url https://download.pytorch.org/whl/${TORCH_CUDA_CHANNEL}
