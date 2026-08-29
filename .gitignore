@@ -1,0 +1,6 @@
+# Persisted runtime data (models, outputs, installed nodes, user settings)
+/data/
+
+# OS / editor noise
+.DS_Store
+*.swp
