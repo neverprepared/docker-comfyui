@@ -9,7 +9,7 @@ if [ ! -d "${COMFYUI_DIR}/custom_nodes/ComfyUI-Manager" ]; then
     echo "[entrypoint] ComfyUI-Manager not found in custom_nodes; installing..."
     git clone https://github.com/ltdrdata/ComfyUI-Manager.git \
         "${COMFYUI_DIR}/custom_nodes/ComfyUI-Manager"
-    python3 -m pip install --no-cache-dir \
+    uv pip install \
         -r "${COMFYUI_DIR}/custom_nodes/ComfyUI-Manager/requirements.txt" || true
 fi
 

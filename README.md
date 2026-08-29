@@ -62,6 +62,10 @@ Drop model files into the matching subfolders of `data/models/` (e.g.
 
 ## Notes / limitations
 
+- Image builds use [`uv`](https://github.com/astral-sh/uv) instead of pip for
+  fast, reliable dependency resolution (installed system-wide via
+  `UV_SYSTEM_PYTHON`). `pip` is still present in the image because
+  ComfyUI-Manager shells out to it when installing custom nodes from its UI.
 - Python packages that custom nodes install (via Manager) live in the image's
   site-packages, which is **not** persisted. If you recreate the container
   (`docker compose up --build`), re-run *Manager → Install missing custom nodes*
