@@ -59,6 +59,9 @@ Drop model files into the matching subfolders of `data/models/` (e.g.
   docker compose build --build-arg TORCH_CUDA_CHANNEL=cu121
   ```
 - **Pin ComfyUI version** — build with `--build-arg COMFYUI_REF=<tag-or-commit>`.
+- **Python version** — the image runs ComfyUI's recommended **Python 3.13**
+  (a uv-managed standalone build in a venv at `/opt/venv`). Override with
+  `--build-arg PYTHON_VERSION=3.12` if a node pack needs an older interpreter.
 
 ## Notes / limitations
 

@@ -5,26 +5,32 @@ FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
-    # Let uv install into the container's system Python without a venv.
-    UV_SYSTEM_PYTHON=1 \
     UV_NO_CACHE=1 \
-    UV_BREAK_SYSTEM_PACKAGES=1
+    UV_PYTHON_INSTALL_DIR=/opt/uv-python \
+    # All Python work happens inside this uv-managed venv; put it first on PATH
+    # so `python`/`python3`/`pip` resolve to it (incl. ComfyUI-Manager's runtime installs).
+    VIRTUAL_ENV=/opt/venv \
+    PATH=/opt/venv/bin:$PATH
 
 # uv: fast Python package installer/resolver (replaces pip).
 # Pin a specific tag (e.g. :0.5.11) for reproducible builds.
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
-# System deps: python, git, and the libGL/glib libraries many nodes need.
+# System deps: git, the libGL/glib libraries many nodes need, and ffmpeg.
+# Python itself comes from uv (below), not apt.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
-        python3 \
-        python3-dev \
-        python3-pip \
         libgl1 \
         libglib2.0-0 \
         ffmpeg \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+# Python 3.13 (ComfyUI's recommended version) via a uv-managed standalone build.
+# Override with --build-arg PYTHON_VERSION=3.12 if a node pack needs an older one.
+ARG PYTHON_VERSION=3.13
+RUN uv venv --python "${PYTHON_VERSION}" "${VIRTUAL_ENV}" \
+    && uv pip install pip  # ComfyUI-Manager shells out to pip when installing nodes
 
 # PyTorch with CUDA support. Override the CUDA channel at build time if needed,
 # e.g. --build-arg TORCH_CUDA_CHANNEL=cu121
