@@ -9,6 +9,10 @@ services:
         COMFYUI_REF: master
     image: comfyui:latest
     container_name: comfyui
+    # CUDA PyTorch wheels are x86_64-only. Force amd64 so the image is correct
+    # for NVIDIA hosts even when built on an arm64 machine (e.g. Apple Silicon,
+    # where it builds under emulation and cannot use a GPU locally).
+    platform: linux/amd64
     restart: unless-stopped
     ports:
       - "8188:8188"

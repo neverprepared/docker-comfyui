@@ -6,7 +6,11 @@ using your NVIDIA GPU.
 
 ## Requirements
 
-- An NVIDIA GPU + recent driver
+- An **x86_64 (amd64) Linux host** with an **NVIDIA GPU** + recent driver.
+  CUDA PyTorch wheels are x86_64-only, and CUDA is unavailable on macOS
+  (no NVIDIA GPU, no GPU passthrough in Docker Desktop). The compose file pins
+  `platform: linux/amd64`, so you *can* build the image on an Apple Silicon Mac
+  (under emulation) to deploy elsewhere — but it will not run with a GPU there.
 - [Docker Engine](https://docs.docker.com/engine/install/) with
   [Docker Compose v2](https://docs.docker.com/compose/)
 - [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
